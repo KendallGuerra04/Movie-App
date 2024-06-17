@@ -3,14 +3,13 @@
     <div class="container mx-auto max-w-7xl py-2 sm:px-6 lg:px-8 ">
         <h1
             class="text-4xl font-bold subpixel-antialiased decoration-blue-400 decoration-wavy underline decoration-4 text-white text-center">
-            Popular
-            Movies and
-            TV-series</h1>
+            ALL
+            {{ Str::upper($type) }}</h1>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10 mt-5">
             @foreach ($popularData->results as $data)
                 <div>
                     <figure class="relative max-w-sm transition-all duration-300 cursor-pointer">
-                        <a href="{{ route('movie', ['id' => $data->id, 'type' => $data->media_type]) }}">
+                        <a href="{{ route('movie', ['id' => $data->id, 'type' => $type]) }}">
                             <img class="h-96 rounded-lg brightness-100 hover:brightness-50"
                                 src="{{ $image . $data->poster_path }}" alt="image description">
                         </a>

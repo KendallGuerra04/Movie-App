@@ -9,33 +9,97 @@ use PhpParser\JsonDecoder;
 class HomeController extends Controller
 {
     private $apikey;
-    private $urlMoviePopular;
-    private $urlDetailMovie;
-    private $urlDetailTv;
-    private $urlImage;
+    private $baseUrl;
+    private $imageUrl;
+    private $endpoints;
 
     public function __construct()
     {
-        $this->apikey = '?api_key=38bce4f5ebd5234816a6cc12405e99fb';
-        $this->urlMoviePopular = 'https://api.themoviedb.org/3/trending/all/day';
-        $this->urlDetailMovie = 'https://api.themoviedb.org/3/movie/';
-        $this->urlImage = 'https://image.tmdb.org/t/p/original';
-        $this->urlDetailTv = 'https://api.themoviedb.org/3/tv/';
+        $this->apikey = config('tmdb.apikey');
+        $this->baseUrl = config('tmdb.base_url');
+        $this->imageUrl = config('tmdb.image_url');
+        $this->endpoints = config('tmdb.endpoints');
     }
     public function home()
     {
-        $response = Http::get($this->urlMoviePopular . $this->apikey);
+        $response = $this->fetchData($this->endpoints['trending']);
         $popularData = $response->object();
-        return view('components.content.home', ['popularData' => $popularData, 'image' => $this->urlImage]);
+        // dd($popularData);
+        return view('components.content.home', [
+            'popularData' => $popularData,
+            'image' => $this->imageUrl
+        ]);
     }
     public function movie($id, $type)
     {
         if ($type == 'movie') {
-            $response = Http::get($this->urlDetailMovie . $id . $this->apikey);
+            $detailUrl = sprintf($this->endpoints['movie_detail'], $id);
+            $videoUrl = sprintf($this->endpoints['movie_videos'], $id);
+            $image = sprintf($this->endpoints['movie_image'], $id);
         } else {
-            $response = Http::get($this->urlDetailTv . $id . $this->apikey);
+            $detailUrl = sprintf($this->endpoints['tv_detail'], $id);
+            $videoUrl = sprintf($this->endpoints['tv_videos'], $id);
+            $image = sprintf($this->endpoints['tv_image'], $id);
         }
-        $detailMT = json_decode($response);
-        return view('components.detailMTV', ['data' => $detailMT, 'image' => $this->urlImage]);
+        $detailResponse = $this->fetchData($detailUrl);
+        $videoResponse = $this->fetchData($videoUrl);
+        $imageResponse = $this->fetchData($image);
+
+        $detailMT = $detailResponse->object();
+        $videoMT = $videoResponse->object();
+        $imageMT = $imageResponse->object();
+
+        $getImage = $this->getImage($imageMT->backdrops, $detailMT->backdrop_path);
+        $firstTrailer = $this->getFirstTrailer($videoMT->results);
+
+        return view('components.detailMTV', [
+            'data' => $detailMT,
+            'image' => $this->imageUrl,
+            'video' => $firstTrailer,
+            'backgroundMT' => $getImage
+        ]);
+    }
+    public function movies()
+    {
+        $response = $this->fetchData($this->endpoints['list_movies']);
+        $moviesData = $response->object();
+        return view('components.mtv', [
+            'popularData' => $moviesData,
+            'image' => $this->imageUrl,
+            'type' => 'movie'
+        ]);
+    }
+    public function series()
+    {
+        $response = $this->fetchData($this->endpoints['list_tv']);
+        $tvData = $response->object();
+        return view('components.mtv', [
+            'popularData' => $tvData,
+            'image' => $this->imageUrl,
+            'type' => 'tv'
+        ]);
+    }
+
+    private function fetchData($endpoint)
+    {
+        $url = $this->baseUrl . $endpoint . '?api_key=' . $this->apikey;
+        return Http::get($url);
+    }
+    private function getFirstTrailer($videos)
+    {
+        foreach ($videos as $video) {
+            if ($video->type == 'Trailer' || $video->type != 'Trailer') {
+                return $video;
+            }
+        }
+    }
+
+    private function getImage($images, $imageTM)
+    {
+        foreach ($images as $image) {
+            if ($image->file_path <> $imageTM) {
+                return $image->file_path;
+            }
+        }
     }
 }

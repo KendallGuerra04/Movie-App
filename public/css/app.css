@@ -13,3 +13,9 @@ main {
     width: 100%;
     text-align: center;
 }
+
+.title{
+    --animate-repeat: infinite;
+    --animate-duration: 5s;
+    --animate-delay: 5s;
+}
