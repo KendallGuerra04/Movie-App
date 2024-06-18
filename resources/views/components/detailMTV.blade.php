@@ -56,13 +56,18 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Contenedor del iframe -->
                 <div class="p-8 text-white w-3/6">
                     <div class="relative w-full h-0 pb-[56.25%]"> <!-- Aspect ratio de 16:9 -->
-                        <iframe class="absolute top-0 left-0 w-full h-full"
-                            src="https://www.youtube.com/embed/{{ $video->key }}" frameborder="0"
-                            allowfullscreen></iframe>
+                        @if (isset($video->key))
+                            <iframe class="absolute top-0 left-0 w-full h-full"
+                                src="https://www.youtube.com/embed/{{ $video->key }}" frameborder="0"
+                                allowfullscreen></iframe>
+                        @else
+                            <img src="{{ asset('img/video_not_found.jpg') }}" class="absolute top-0 left-0 w-full h-full"
+                                alt="">
+                        @endif
+
                     </div>
                 </div>
             </div>

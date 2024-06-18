@@ -10,7 +10,7 @@
             @foreach ($popularData->results as $data)
                 <div>
                     <figure class="relative max-w-sm transition-all duration-300 cursor-pointer">
-                        <a href="{{ route('movie', ['id' => $data->id, 'type' => $data->media_type]) }}">
+                        <a href="{{ route('mtv', ['id' => $data->id, 'type' => $data->media_type]) }}">
                             <img class="h-96 rounded-lg brightness-100 hover:brightness-50"
                                 src="{{ $image . $data->poster_path }}" alt="image description">
                         </a>

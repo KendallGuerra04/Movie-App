@@ -12,6 +12,7 @@ class HomeController extends Controller
     private $baseUrl;
     private $imageUrl;
     private $endpoints;
+    private $resp;
 
     public function __construct()
     {
@@ -19,10 +20,13 @@ class HomeController extends Controller
         $this->baseUrl = config('tmdb.base_url');
         $this->imageUrl = config('tmdb.image_url');
         $this->endpoints = config('tmdb.endpoints');
+        $this->resp = false;
     }
     public function home()
     {
-        $response = $this->fetchData($this->endpoints['trending']);
+        $page = null;
+        $this->resp = false;
+        $response = $this->fetchData($this->endpoints['trending'], $this->resp, $page);
         $popularData = $response->object();
         // dd($popularData);
         return view('components.content.home', [
@@ -30,8 +34,9 @@ class HomeController extends Controller
             'image' => $this->imageUrl
         ]);
     }
-    public function movie($id, $type)
+    public function mtv($id, $type)
     {
+        $page = null;
         if ($type == 'movie') {
             $detailUrl = sprintf($this->endpoints['movie_detail'], $id);
             $videoUrl = sprintf($this->endpoints['movie_videos'], $id);
@@ -41,9 +46,9 @@ class HomeController extends Controller
             $videoUrl = sprintf($this->endpoints['tv_videos'], $id);
             $image = sprintf($this->endpoints['tv_image'], $id);
         }
-        $detailResponse = $this->fetchData($detailUrl);
-        $videoResponse = $this->fetchData($videoUrl);
-        $imageResponse = $this->fetchData($image);
+        $detailResponse = $this->fetchData($detailUrl, $this->resp, $page);
+        $videoResponse = $this->fetchData($videoUrl, $this->resp, $page);
+        $imageResponse = $this->fetchData($image, $this->resp, $page);
 
         $detailMT = $detailResponse->object();
         $videoMT = $videoResponse->object();
@@ -59,30 +64,41 @@ class HomeController extends Controller
             'backgroundMT' => $getImage
         ]);
     }
-    public function movies()
+    public function movies($page)
     {
-        $response = $this->fetchData($this->endpoints['list_movies']);
+        $this->resp = true;
+        $response = $this->fetchData($this->endpoints['list_movies'], $this->resp, $page);
         $moviesData = $response->object();
+
         return view('components.mtv', [
             'popularData' => $moviesData,
             'image' => $this->imageUrl,
-            'type' => 'movie'
+            'type' => 'movie',
+            'page' => $page,
+            'rout' => 'movies'
         ]);
     }
-    public function series()
+    public function series($page)
     {
-        $response = $this->fetchData($this->endpoints['list_tv']);
+        $this->resp = true;
+        $response = $this->fetchData($this->endpoints['list_tv'], $this->resp, $page);
         $tvData = $response->object();
         return view('components.mtv', [
             'popularData' => $tvData,
             'image' => $this->imageUrl,
-            'type' => 'tv'
+            'type' => 'tv',
+            'page' => $page,
+            'rout' => 'series'
         ]);
     }
 
-    private function fetchData($endpoint)
+    private function fetchData($endpoint, $search, $page)
     {
-        $url = $this->baseUrl . $endpoint . '?api_key=' . $this->apikey;
+        if ($search == true) {
+            $url = $this->baseUrl . $endpoint . '?api_key=' . $this->apikey . '&region=PA&page=' . $page;
+        } else {
+            $url = $this->baseUrl . $endpoint . '?api_key=' . $this->apikey;
+        }
         return Http::get($url);
     }
     private function getFirstTrailer($videos)

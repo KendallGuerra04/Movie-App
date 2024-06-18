@@ -31,9 +31,9 @@
             <a class="py-3 ps-px sm:px-3 sm:py-6 font-medium text-white hover:text-gray-500 dark:text-white dark:hover:text-neutral-500"
                 href="{{ route('home') }}" aria-current="page">Home</a>
             <a class="py-3 ps-px sm:px-3 sm:py-6 font-medium text-white hover:text-gray-500 dark:text-white dark:hover:text-neutral-500"
-                href="{{ route('movies') }}">Movies</a>
+                href="{{ route('movies', ['page' => 1]) }}">Movies</a>
             <a class="py-3 ps-px sm:px-3 sm:py-6 font-medium text-white hover:text-gray-500 dark:text-white dark:hover:text-neutral-500"
-                href="{{ route('series') }}">Tv Series</a>
+                href="{{ route('series', ['page' => 1]) }}">Tv Series</a>
 
         </div>
     </div>
