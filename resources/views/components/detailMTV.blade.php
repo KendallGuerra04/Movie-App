@@ -25,7 +25,7 @@
         <!-- Contenedor del texto descriptivo -->
         <div class="relative h-screen">
             <!-- Imagen de fondo con blur -->
-            <div class="absolute inset-0 bg-cover bg-no-repeat blur-lg"
+            <div class="absolute inset-0 bg-cover bg-no-repeat blur-lg brightness-50"
                 style="background-image: url('{{ $image . $backgroundMT }}'); z-index: -1;">
             </div>
 
