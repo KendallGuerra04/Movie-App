@@ -80,6 +80,7 @@ class HomeController extends Controller
     }
     public function series($page)
     {
+
         $this->resp = true;
         $response = $this->fetchData($this->endpoints['list_tv'], $this->resp, $page);
         $tvData = $response->object();

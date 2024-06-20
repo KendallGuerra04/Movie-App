@@ -2,9 +2,13 @@
 @section('content')
     <div class="container mx-auto max-w-7xl py-2 sm:px-6 lg:px-8 ">
         <h1
-            class="text-4xl font-bold subpixel-antialiased decoration-blue-400 decoration-wavy underline decoration-4 text-white text-center">
+            class="text-4xl font-bold subpixel-antialiased decoration-blue-400 decoration-wavy my-5
+            underline decoration-4 text-white text-center">
             ALL
             {{ Str::upper($type) }}</h1>
+        <nav class="flex items-center gap-x-1 justify-center">
+            @include('components.pagination')
+        </nav>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10 mt-5">
             @foreach ($popularData->results as $data)
                 <div>
